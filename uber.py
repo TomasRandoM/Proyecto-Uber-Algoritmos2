@@ -1,9 +1,9 @@
 import graph
 """
 Función para ingresar las calles y esquinas, contenidas como String y pasarlas a lista de esquinas y lista de tuplas, en el caso de las calles.
-Se borra la el caracter "e" y en las listas resultantes quedan las esquinas y distancias como enteros (o reales en el caso de las distancias)
-Salida: Lista corner que contiene a las esquinas de la forma [0, 1, 2, 3, 4] y lista street que contiene a las calles de la forma
-[(esquina1, esquina2, distancia)] por ejemplo [(0, 1, 2.0), (0, 4, 22.0)]
+En las listas resultantes quedan las esquinas y distancias (distancias como float)
+Salida: Lista corner que contiene a las esquinas de la forma [e0, e1, e2, e3, e4] y lista street que contiene a las calles de la forma
+[(esquina1, esquina2, distancia)] por ejemplo [(e0, e1, 2.0), (e0, e4, 22.0)]
 """
 def start():
     fileDir = str(input("Ingrese ruta del archivo: "))
@@ -15,8 +15,6 @@ def start():
     streets = f.readline()
     corner = corner.strip("[]\n")
     corner = corner.split(", ")
-    for i in range(0, len(corner)):
-        corner[i] = int(corner[i][1:])
     street = []
     cond = False
     cont = 0
@@ -40,7 +38,7 @@ def start():
             cont = 1
         if streets[i] == ")":
             cond = False
-            street.append((int(e1[1:]), int(e2[1:]), float(p)))
+            street.append((e1, e2, float(p)))
             e1 = ""
             e2 = ""
             p = ""
@@ -53,7 +51,7 @@ a createGraph (del módulo graph.py) y guarda el mapa en "theMap", representado 
 """
 def createMap():
     corner, street = start()
-    theMap = graph.createGraph(corner, street)
+    theMap, hashTable = graph.createGraph(corner, street)
     #Prueba theMap (Luego borrar)
     for i in range(0, len(theMap)):
         auxList = theMap[i]

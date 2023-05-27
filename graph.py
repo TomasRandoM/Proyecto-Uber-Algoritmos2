@@ -1,25 +1,31 @@
 import math
+import dictionary
+
 class vertex:
     value = None
     dist = None
 
 #Crea grafo dirigido y ponderado representado por lista de adyacencia
 """
-Se utiliza listas de Python para crear las listas de adyacencia. Cada elemento de la lista es una tupla (v, d) en el que v es el vértice y
-d es la distancia hasta ese vértice (O el valor de la arista)
+Se utiliza listas de Python para crear las listas de adyacencia. Cada elemento de la lista es una tupla (v, d) en el que v es el vértice asignado a cada esquina y
+d es la distancia hasta ese vértice (O el valor de la arista). El vértice asignado a cada esquina se guarda en la hashTable, donde se guarda con la key "e1" (ejemplo),
+y element = vértice asignado.
+Salida = Grafo (Graph) representado mediante lista de adyacencia. Lista hash con las esquinas y sus vértices (hashTable)
 """
 def createGraph(list1, list2):
     Graph = []
+    hashTable = dictionary.dictionary(list1)
     n = len(list1)
     for i in range(0, n):
         Graph.append([])
+        hashTable = dictionary.insert(hashTable, i, list1[i])
 
     for i in list2:
         newVertex = vertex()
-        newVertex.value = i[1]
+        newVertex.value = dictionary.search(hashTable, i[1])
         newVertex.dist = i[2]
-        Graph[i[0]].append(newVertex)
-    return Graph
+        Graph[dictionary.search(hashTable, i[0])].append(newVertex)
+    return Graph, hashTable
 
 """
 dijkstra(Graph, v) recibe el Grafo y un vértice inicial. Devuelve una lista del tamaño de los vértices de la forma:
@@ -87,8 +93,6 @@ def dijkstra(Graph, s):
             if condition == True:
                 vertices, Q = relax(Graph, Q, vertices, u[0], Graph[u[0]][i])
     return vertices
-
-
 
 """
 FUNCIONES DE REPUESTO
