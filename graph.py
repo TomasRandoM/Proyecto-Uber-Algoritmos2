@@ -1,5 +1,6 @@
 import math
 import dictionary
+import queue
 
 class vertex:
     value = None
@@ -31,7 +32,7 @@ def createGraph(list1, list2):
 dijkstra(Graph, v) recibe el Grafo y un vértice inicial. Devuelve una lista del tamaño de los vértices de la forma:
 [v1, v2, v3, v4, v5, v6, ..., m] donde cada vX tiene atributos "value", "d" y "pi".
 value contiene el número de vértice, d la menor distancia hasta el vértice inicial y pi el ancestro de cada vértice. 
-"""
+
 #Clase para contener el ancestro, la menor distancia y el valor de cada vértice
 class dijVertex:
     value = None
@@ -93,6 +94,31 @@ def dijkstra(Graph, s):
             if condition == True:
                 vertices, Q = relax(Graph, Q, vertices, u[0], Graph[u[0]][i])
     return vertices
+"""
+
+def dijkstra(Graph, s):
+    visited = []
+    distancia = []
+    for i in range(0, len(Graph)):
+        visited.append(0)
+        distancia.append(math.inf)
+    pqueue = queue.PriorityQueue()
+    distancia[s] = 0
+    pqueue.put((0, s))
+    while pqueue.empty() != True:
+        element = pqueue.get()
+        u = element[1]
+        visited[u] = True
+        for i in range(0, len(Graph[u])):
+            if visited[Graph[u][i].value] == 1:
+                continue
+            distAux = distancia[u] + Graph[u][i].dist
+            if distAux < distancia[Graph[u][i].value]:
+                distancia[Graph[u][i].value] = distAux
+                pqueue.put((distAux, Graph[u][i].value))
+    return distancia
+
+
 
 """
 FUNCIONES DE REPUESTO

@@ -61,5 +61,5 @@ def createMap():
     #Prueba dijkstra (Luego borrar)
     vector = graph.dijkstra(theMap, 0)
     for i in range(0, len(vector)):
-        print((vector[i].value, vector[i].d), end=" ")
+        print((i, vector[i]), end=" ")
 createMap()
