@@ -15,7 +15,10 @@ Salida = Grafo (Graph) representado mediante lista de adyacencia. Lista hash con
 """
 def createGraph(list1, list2):
     Graph = []
-    hashTable = dictionary.dictionary(list1)
+    m = len(list1)
+    if m % 2 == 0:
+        m = m + 1
+    hashTable = dictionary.dictionary(m)
     n = len(list1)
     for i in range(0, n):
         Graph.append([])
