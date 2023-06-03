@@ -99,9 +99,11 @@ def dijkstra(Graph, s):
 def dijkstra(Graph, s):
     visited = []
     distancia = []
+    antecesor = []
     for i in range(0, len(Graph)):
         visited.append(0)
         distancia.append(math.inf)
+        antecesor.append(None)
     pqueue = queue.PriorityQueue()
     distancia[s] = 0
     pqueue.put((0, s))
@@ -114,12 +116,17 @@ def dijkstra(Graph, s):
                 continue
             distAux = distancia[u] + Graph[u][i].dist
             if distAux < distancia[Graph[u][i].value]:
+                antecesor[Graph[u][i].value] = u
                 distancia[Graph[u][i].value] = distAux
                 pqueue.put((distAux, Graph[u][i].value))
-    return distancia
+    return distancia, antecesor
 
-
-
+def shortestPath(antecesor, s):
+    shortPath = []
+    while s != None:
+        shortPath.insert(0, s)
+        s = antecesor[s]
+    return shortPath
 """
 FUNCIONES DE REPUESTO
 def createGraph(list1, list2):

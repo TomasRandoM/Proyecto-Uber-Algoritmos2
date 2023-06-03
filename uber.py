@@ -59,7 +59,13 @@ def createMap():
             print((auxList[j].value, auxList[j].dist), end= " ")
         print(" ")
     #Prueba dijkstra (Luego borrar)
-    vector = graph.dijkstra(theMap, 0)
+    vector, antecesor = graph.dijkstra(theMap, 0)
     for i in range(0, len(vector)):
         print((i, vector[i]), end=" ")
+    print(" ")
+    for i in range(0, len(vector)):
+        print((i, antecesor[i]), end=" ")
+    #Prueba shortestPath
+    print(" ")
+    print(graph.shortestPath(antecesor, 2))
 createMap()
