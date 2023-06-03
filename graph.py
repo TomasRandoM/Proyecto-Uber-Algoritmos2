@@ -15,7 +15,10 @@ Salida = Grafo (Graph) representado mediante lista de adyacencia. Lista hash con
 """
 def createGraph(list1, list2):
     Graph = []
-    hashTable = dictionary.dictionary(list1)
+    m = len(list1)
+    if m % 2 == 0:
+        m = m + 1
+    hashTable = dictionary.dictionary(m)
     n = len(list1)
     for i in range(0, n):
         Graph.append([])
@@ -99,9 +102,11 @@ def dijkstra(Graph, s):
 def dijkstra(Graph, s):
     visited = []
     distancia = []
+    antecesor = []
     for i in range(0, len(Graph)):
         visited.append(0)
         distancia.append(math.inf)
+        antecesor.append(None)
     pqueue = queue.PriorityQueue()
     distancia[s] = 0
     pqueue.put((0, s))
@@ -114,12 +119,17 @@ def dijkstra(Graph, s):
                 continue
             distAux = distancia[u] + Graph[u][i].dist
             if distAux < distancia[Graph[u][i].value]:
+                antecesor[Graph[u][i].value] = u
                 distancia[Graph[u][i].value] = distAux
                 pqueue.put((distAux, Graph[u][i].value))
-    return distancia
+    return distancia, antecesor
 
-
-
+def shortestPath(antecesor, s):
+    shortPath = []
+    while s != None:
+        shortPath.insert(0, s)
+        s = antecesor[s]
+    return shortPath
 """
 FUNCIONES DE REPUESTO
 def createGraph(list1, list2):

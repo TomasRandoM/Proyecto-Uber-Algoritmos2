@@ -19,11 +19,10 @@ def hashFunction(x, m):
     return int((m * ((hashValue * A) % 1))) % m
 
 """
-Función que crea una hash table y la devuelve. La longitud de la hash será de 2 veces la lista pasada + 1.
+Función que crea una hash table y la devuelve. La longitud de la hash será de n.
 Salida: Hash table de tamaño (len(x) * 2) + 1
 """
-def dictionary(x):
-    n = len(x) * 2 + 1
+def dictionary(n):
     hashTable = []
     for i in range(0, n):
         hashTable.append([])
