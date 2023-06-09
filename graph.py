@@ -178,3 +178,25 @@ def recorrerArista(Graph, direc, newVertex, e1, e2, nextVertex, status, first):
                 Graph[nextVertex].insert(0, newVertex)
                 Graph[k].append(vertex)
                 return Graph
+            
+
+"""
+Función que verifica el sentido de la calle. Devuelve 1 si la calle es del sentido (e1, e2), devuelve 2 si es
+(e2, e1) y devuelve 3 si es de doble sentido
+"""
+def sentidoCalle(Graph, e1, e2):
+    list1 = Graph[e1]
+    status = 0
+    for i in list1:
+        if (i.value == e2) or (i.nextCorner == e2):
+            status = 1
+            break
+    list1 = Graph[e2]
+    for i in list1:
+        if (i.value == e1) or (i.nextCorner == e1):
+            if status == 1:
+                status = 3
+            else:
+                status = 2
+            break
+    return status
