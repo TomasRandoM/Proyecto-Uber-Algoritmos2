@@ -5,6 +5,7 @@ import queue
 class vertex:
     value = None
     dist = None
+    nextCorner = None
 
 #Crea grafo dirigido y ponderado representado por lista de adyacencia
 """
@@ -28,77 +29,23 @@ def createGraph(list1, list2):
         newVertex = vertex()
         newVertex.value = dictionary.search(hashTable, i[1])
         newVertex.dist = i[2]
+        newVertex.nextCorner = None
         Graph[dictionary.search(hashTable, i[0])].append(newVertex)
     return Graph, hashTable
 
+
+#Transforma el valor m a impar en caso de ser par, caso contrario devuelve el mismo número
+def sizeModd(m):
+    if m % 2 == 0:
+        m = m + 1
+    return m
+
 """
 dijkstra(Graph, v) recibe el Grafo y un vértice inicial. Devuelve una lista del tamaño de los vértices de la forma:
-[v1, v2, v3, v4, v5, v6, ..., m] donde cada vX tiene atributos "value", "d" y "pi".
-value contiene el número de vértice, d la menor distancia hasta el vértice inicial y pi el ancestro de cada vértice. 
-
-#Clase para contener el ancestro, la menor distancia y el valor de cada vértice
-class dijVertex:
-    value = None
-    d = math.inf
-    pi = None
-
-#Inicializa la lista "vertices" con todos los vértices. Coloca distancia del primer vértice en 0
-def initRelax(G, vertices, s):
-    for i in range(len(G)):
-        v = dijVertex()
-        v.value = i
-        vertices.append(v)
-    vertices[s].d = 0
-    vertices[s].pi = s
-    return vertices
-
-#Función que "relaja" cada vértice. Si la distancia del vértice objetivo es
-#mayor a la suma de la distancia del vértice actual + el valor de la arista, entonces
-#cambia el valor de la distancia del vértice objetivo por el nuevo valor.
-def relax(Graph, Q, vertices, u, vertice):
-    if vertices[vertice.value].d > vertices[u].d + vertice.dist:
-        vertices[vertice.value].d = vertices[u].d + vertice.dist
-        aux = vertices[u].d + vertice.dist
-        vertices[vertice.value].pi = u
-        for i in range(len(Q)):
-            if Q[i][0] == vertice.value:
-                aux2 = i
-        #Elimina de Q el vértice objetivo
-        Q.pop(aux2)
-        #Lo vuelve a agregar, pero con distancia actualizada y en la posición correcta (en términos de distancia)
-        if len(Q) == 0:
-            Q.insert(0, (vertice.value, vertices[u].d + vertice.dist))
-        else:
-            for i in range(len(Q)):
-                if aux <= Q[i][1]:
-                    Q.insert(i, (vertice.value, vertices[u].d + vertice.dist))
-                    break
-    return vertices, Q
-
-def dijkstra(Graph, s):
-    vertices = []
-    vertices = initRelax(Graph, vertices, s)
-    S = []
-    Q = []
-    #Inicializa una lista PriorityQueue con todos los vértices y su distancia.
-    #Todas las distancias inicializadas en infinito, excepto el vértice inicial, que es 0.
-    Q.append((s, 0))
-    for i in range(1, len(Graph)):
-        if i != s:
-            Q.append((i, math.inf))
-    while len(Q) > 0:
-        u = Q.pop(0)
-        S.append(u)
-        #Extrae el primer vértice en la lista de prioridad y "relaja" todos sus vértices vecinos.
-        for i in range(0, len(Graph[u[0]])):
-            condition = False
-            if Graph[u[0]][i].value not in S:
-                condition = True
-            if condition == True:
-                vertices, Q = relax(Graph, Q, vertices, u[0], Graph[u[0]][i])
-    return vertices
+[p1, p2, p3, p4, p5, p6, ..., pm] donde cada p corresponde a la distancia desde el vértice s hasta el vértice correspondiente a la posición en la lista.
+Además devuelve la lista antecesor, la cual tiene el mismo tamaño que la anterior y es de la forma [a1, a2, a3, ..., an] correspondiendo cada a al antecesor
+de cada vértice correspondiente a la posición en la lista
 """
-
 def dijkstra(Graph, s):
     visited = []
     distancia = []
@@ -124,49 +71,110 @@ def dijkstra(Graph, s):
                 pqueue.put((distAux, Graph[u][i].value))
     return distancia, antecesor
 
+"""
+shortestPath utiliza la lista calculada por dijkstra (antecesor) y un vértice s. Devuelve una lista con los vértices que forman
+el camino más corto entre s y el vértice utilizado para calcular dijkstra.
+"""
 def shortestPath(antecesor, s):
     shortPath = []
     while s != None:
         shortPath.insert(0, s)
         s = antecesor[s]
     return shortPath
+
 """
-FUNCIONES DE REPUESTO
-def createGraph(list1, list2):
-    Graph = []
-    n = len(list1)
-    for i in range(0, n):
-        Graph.append([])
-
-    for i in list2:
-        element = (i[1], i[2])
-        Graph[i[0]].append(element)
-    return Graph
-
-def createGraph(list1, list2):
-    Graph = []
-    n = len(list1)
-    for i in range(0, n):
-        Graph.append([])
-
-    for i in list2:
-        newVertex = vertex()
-        newVertex.value = i[1]
-        newVertex.dist = i[2]
-        Graph[i[0]].append(newVertex)
-    return Graph
-
-
-def createGraph(list1, list2):
-    Graph = Array(len(list1), [])
-
-    for i in range (0, len(list1)):
-        Graph[i] = []
-
-    for i in list2:
-        newVertex = vertex()
-        newVertex.value = i[1]
-        newVertex.dist = i[2]
-        Graph[i[0]].append(newVertex)
-    return Graph
+Función que inserta una ubicación FIJA en el grafo. Recibe el Grafo, la hashTable correspondiente a las ubicaciones fijas, la hashtable correspondiente
+a las esquinas y la variable ad que es la dirección de la ubicación fija que viene dada de la forma <nombre, {<e1, p>, <e2, p2>}. Devuelve el grafo
+con el vértice insertado.
 """
+def insert(Graph, hashTable, esquinas, ad):
+    p1 = ""
+    p2 = ""
+    e1 = ""
+    e2 = ""
+    name = ""
+    cont = 1
+    for i in ad:
+        if (i != ",") and (i != ")"):
+            if i != " " and (i != "<") and (i != "{") and (i != "}") and (i != ">"):
+                if cont == 1:
+                    name = name + i
+                elif cont == 2:
+                    e1 = e1 + i
+                elif cont == 3:
+                    p1 = p1 + i
+                elif cont == 4:
+                    e2 = e2 + i
+                else:
+                    p2 = p2 + i
+        else:
+            cont += 1
+        if i == ad[len(ad) - 1]:
+            break
+    direc = (name, len(Graph), (e1, float(p1), e2, float(p2)))
+    dictionary.insert(hashTable, direc, name)
+    e1 = dictionary.search(esquinas, e1)
+    e2 = dictionary.search(esquinas, e2)
+    newVertex = vertex()
+    newVertex.value = direc[1]
+    list1 = Graph[e1]
+    Graph.append([])
+    status = 0
+    for i in list1:
+        if (i.value == e2) or (i.nextCorner == e2):
+            status = 1
+            newVertex.nextCorner = e2
+            break
+    list1 = Graph[e2]
+    for i in list1:
+        if (i.value == e1) or (i.nextCorner == e1):
+            if status == 1:
+                status = 2
+                newVertex2 = vertex()
+                newVertex2.value = newVertex.value
+                newVertex2.nextCorner = e1
+            else:
+                status = 4
+                newVertex.nextCorner = e1
+            break
+    if status == 1:
+        Graph = recorrerArista(Graph, direc, newVertex, e1, e2, e1, 1, 1)
+    elif status == 4:
+        Graph = recorrerArista(Graph, direc, newVertex, e2, e1, e2, 2, 1)
+    elif status == 2:
+        Graph = recorrerArista(Graph, direc, newVertex, e1, e2, e1, 1, 1)
+        Graph = recorrerArista(Graph, direc, newVertex2, e2, e1, e2, 2, 1)
+    return Graph
+
+#Función recursiva auxiliar de insert
+def recorrerArista(Graph, direc, newVertex, e1, e2, nextVertex, status, first):
+    list1 = Graph[nextVertex]
+    k = len(Graph) - 1
+    if first != 0:
+        if status == 1:
+            newVertex.dist = direc[2][1]
+        elif status == 2:
+            newVertex.dist = direc[2][3]
+    for i in range (len(list1)):
+        if list1[i].value == e2:
+            vertex = Graph[nextVertex].pop(i)
+            if status == 2:
+                vertex.dist = direc[2][1]
+            else:
+                vertex.dist = direc[2][3]
+            Graph[nextVertex].insert(0, newVertex)
+            Graph[k].append(vertex)
+            return Graph
+        if list1[i].nextCorner == e2:
+            if list1[i].dist < newVertex.dist:
+                newVertex.dist = newVertex.dist - list1[i].dist
+                return recorrerArista(Graph, direc, newVertex, e1, e2, list1[i].value, status, 0)
+            else:
+                vertex = Graph[nextVertex].pop(i)
+                if status == 2:
+                    vertex.dist = abs(vertex.dist - direc[2][1])
+                else:
+                    vertex.dist = abs(vertex.dist - direc[2][3])
+                Graph[nextVertex].insert(0, newVertex)
+                Graph[k].append(vertex)
+                return Graph

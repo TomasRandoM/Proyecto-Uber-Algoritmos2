@@ -1,4 +1,5 @@
 import graph
+import dictionary
 """
 Función para ingresar las calles y esquinas, contenidas como String y pasarlas a lista de esquinas y lista de tuplas, en el caso de las calles.
 En las listas resultantes quedan las esquinas y distancias (distancias como float)
@@ -51,21 +52,42 @@ a createGraph (del módulo graph.py) y guarda el mapa en "theMap", representado 
 """
 def createMap():
     corner, street = start()
-    theMap, hashTable = graph.createGraph(corner, street)
-    #Prueba theMap (Luego borrar)
+    theMap, esquinas = graph.createGraph(corner, street)
+    dirFijas = dictionary.dictionary(graph.sizeModd(len(corner)))
+
+    print("======Mapa=======")
     for i in range(0, len(theMap)):
         auxList = theMap[i]
+        print(i, end =" ")
         for j in range(0, len(auxList)):
             print((auxList[j].value, auxList[j].dist), end= " ")
         print(" ")
+    Graph = graph.insert(theMap, dirFijas, esquinas, "<r0, {<e0, 2>, <e1, 3>}")
+    Graph = graph.insert(theMap, dirFijas, esquinas, "<r2, {<e1, 2>, <e4, 2>}")
+    Graph = graph.insert(theMap, dirFijas, esquinas, "<r4, {<e1, 3>, <e4, 1>}")
+    Graph = graph.insert(theMap, dirFijas, esquinas, "<r5, {<e3, 6>, <e4, 4>}")
+    Graph = graph.insert(theMap, dirFijas, esquinas, "<r6, {<e4, 1.5>, <e1, 2.5>}")
+
+    #Prueba theMap (Luego borrar)
+    print("======Mapa luego insert=======")
+    for i in range(0, len(theMap)):
+        auxList = theMap[i]
+        print(i, end =" ")
+        for j in range(0, len(auxList)):
+            print((auxList[j].value, auxList[j].dist, auxList[j].nextCorner), end= " ")
+        print(" ")
     #Prueba dijkstra (Luego borrar)
+    print("======Dijkstra=======")
     vector, antecesor = graph.dijkstra(theMap, 0)
     for i in range(0, len(vector)):
         print((i, vector[i]), end=" ")
     print(" ")
+    print("======Antecesor=======")
     for i in range(0, len(vector)):
         print((i, antecesor[i]), end=" ")
     #Prueba shortestPath
     print(" ")
+    print("======shortestPath=======")
     print(graph.shortestPath(antecesor, 2))
+
 createMap()

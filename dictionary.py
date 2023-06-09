@@ -20,7 +20,7 @@ def hashFunction(x, m):
 
 """
 Función que crea una hash table y la devuelve. La longitud de la hash será de n.
-Salida: Hash table de tamaño (len(x) * 2) + 1
+Salida: Hash table vacía de tamaño n
 """
 def dictionary(n):
     hashTable = []
