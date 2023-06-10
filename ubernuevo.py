@@ -212,7 +212,7 @@ def createTrip(person, direction):
         if directionNode == None:
             print("Esta ubicación fija no se encuentra en el mapa.")
             return
-        directiontrip = getDirection(directionNode[2])
+        directiontrip = directionNode[2]
         
     f = open("hashMobile.pickle", "rb")
     hashMovil = pickle.load(f)
@@ -223,19 +223,23 @@ def createTrip(person, direction):
         print("Esta persona no se encuentra en el mapa.")
         return
     
-    f.open("mapa.pickle", "rb")
+    f = open("mapa.pickle", "rb")
     map = pickle.load(f)
     f.close()
-    f.open("hashCorners.pickle", "rb")
+    f = open("hashCorners.pickle", "rb")
     hashCorners = pickle.load(f)
     f.close()
-    f.open("cornerDistances.pickle", "rb")
+    f = open("cornerDistances.pickle", "rb")
     priorityQ = pickle.load(f)
     f.close()
     
     ranking = trip.rankingAutos(map,hashCorners,priorityQ,personNode)
     
-    print(ranking)
+    print("OPCIONES | AUTO | COSTO")
+    for i in range(3):
+        print(i+1 , ".      |", ranking[i][0], "  |", ranking[i][1])
+    print("4. No realizar viaje")
+    
 
 """
 Condicionales para manejar los argumentos pasados por consola.
