@@ -70,8 +70,11 @@ def loadMobileElement(element):
     f = open("hashCorners.pickle", "rb")
     hashEsquinas = pickle.load(f)
     f.close()
+    f = open("corners.pickle", "rb")
+    esquinas = pickle.load(f)
+    f.close()
     if element[0][0] == "C":
-        hashMovil = trip.insertCar(mapa, hashMovil, priorityCorners, hashEsquinas, element)
+        hashMovil = trip.insertCar(mapa, hashMovil, priorityCorners, hashEsquinas, element, esquinas)
     elif element[0][0] == "P":
         hashMovil = trip.insertPeople(hashMovil, element)
     else:
@@ -89,6 +92,7 @@ def loadMobileElement(element):
     return
 
 
+
 """
 Función para crear el mapa. Recibe la dirección del archivo que contiene
 las esquinas y las calles. La función cutMap realiza el corte para trabajarla como
@@ -104,6 +108,9 @@ def createMap(fileDir):
     hashDirFijas = dictionary.dictionary(len(theMap))
     hashMobile = dictionary.dictionary(len(theMap))
     cornerDistances = [None] * len(theMap)
+    f = open("corners.pickle", "wb")
+    pickle.dump(corners, f)
+    f.close()
     f = open("cornerDistances.pickle", "wb")
     pickle.dump(cornerDistances, f)
     f.close()

@@ -6,12 +6,12 @@ Inserta el auto en una hashtable (carHashTable) donde van las personas y los aut
 cercanas (si la calle es de doble mano) o solo desde donde puede ir. Luego, ubica las distancias en una lista
 auxiliar (priorityCorners) en la que cada posición representa una esquina (su vértice asociado). Y cada posición
 contiene una priorityQueue con las distancias de los autos hasta esa esquina de la forma (p, C) en la que p es el
-precio total (sacado con la fórmula la cual incluye distancia y precio) y C el auto en cuestión.
-
+precio total (sacado con la fórmula la cual incluye distancia y precio) y C el auto en cuestión. Además, la función
+recibe el parámetro "esquinas" que es la lista de esquinas.
 El parámetro auto viene dado de la forma (nombre, (e1, p1, e2, p2), coste)
 """
 
-def insertCar(Graph, carHashTable, priorityCorners, cornerHashTable, auto):
+def insertCar(Graph, carHashTable, priorityCorners, cornerHashTable, auto, esquinas):
     dictionary.insert(carHashTable, auto, auto[0])
     e1 = dictionary.search(cornerHashTable, auto[1][0])
     e2 = dictionary.search(cornerHashTable, auto[1][2])
@@ -19,16 +19,16 @@ def insertCar(Graph, carHashTable, priorityCorners, cornerHashTable, auto):
     if status == 1:
         distancias, antecesores = graph.dijkstra(Graph, e2)
         car = (auto[0], auto[1][3], auto[2])
-        insertPriortyCorners(car, priorityCorners, distancias, None)
+        insertPriortyCorners(car, priorityCorners, distancias, None, esquinas)
     elif status == 2:
         distancias, antecesores = graph.dijkstra(Graph, e1)
         car = (auto[0], auto[1][1], auto[2])
-        insertPriortyCorners(car, priorityCorners, distancias, None)
+        insertPriortyCorners(car, priorityCorners, distancias, None, esquinas)
     else:
         distancias, antecesores = graph.dijkstra(Graph, e2)
         distancias2, antecesores2 = graph.dijkstra(Graph, e1)
         car = (auto[0], auto[1][3], auto[1][1], auto[2])
-        insertPriortyCorners(car, priorityCorners, distancias, distancias2)
+        insertPriortyCorners(car, priorityCorners, distancias, distancias2, esquinas)
     return carHashTable
 
 """
@@ -36,15 +36,15 @@ Función auxiliar que inserta las distancias calculadas por dijkstra del auto a 
 auxiliar "priorityCorners". Utiliza una priorityQueue e inserta en cada espacio el elemento de la forma
 (precio, nombreAuto) siendo precio el precio calculado utilizando distancia y coste del auto y nombreAuto el nombre del vehículo.
 """
-def insertPriortyCorners(auto, priorityCorners, distancias1, distancias2):
+def insertPriortyCorners(auto, priorityCorners, distancias1, distancias2, esquinas):
     if distancias2 == None:
-        for i in range(0, len(distancias1)):
+        for i in range(0, len(esquinas)):
             if priorityCorners[i] == None:
                 priorityCorners[i] = []
             price = (distancias1[i] + auto[1] + auto[2]) / 4
             priorityCorners[i] = insertWithPriority(priorityCorners[i], (price, auto[0]))
     else:
-        for i in range(0, len(distancias1)):
+        for i in range(0, len(esquinas)):
             if priorityCorners[i] == None:
                 priorityCorners[i] = []
             if distancias1[i] <= distancias2[i]:
