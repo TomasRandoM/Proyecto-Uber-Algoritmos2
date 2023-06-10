@@ -88,31 +88,10 @@ a las esquinas y la variable ad que es la dirección de la ubicación fija que v
 con el vértice insertado.
 """
 def insert(Graph, hashTable, esquinas, ad):
-    p1 = ""
-    p2 = ""
-    e1 = ""
-    e2 = ""
-    name = ""
-    cont = 1
-    for i in ad:
-        if (i != ",") and (i != ")"):
-            if i != " " and (i != "<") and (i != "{") and (i != "}") and (i != ">"):
-                if cont == 1:
-                    name = name + i
-                elif cont == 2:
-                    e1 = e1 + i
-                elif cont == 3:
-                    p1 = p1 + i
-                elif cont == 4:
-                    e2 = e2 + i
-                else:
-                    p2 = p2 + i
-        else:
-            cont += 1
-        if i == ad[len(ad) - 1]:
-            break
-    direc = (name, len(Graph), (e1, float(p1), e2, float(p2)))
-    dictionary.insert(hashTable, direc, name)
+    direc = (ad[0], len(Graph), ad[1])
+    e1 = ad[1][0]
+    e2 = ad[1][2]
+    dictionary.insert(hashTable, direc, direc[0])
     e1 = dictionary.search(esquinas, e1)
     e2 = dictionary.search(esquinas, e2)
     newVertex = vertex()
