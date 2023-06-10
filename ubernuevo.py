@@ -192,6 +192,44 @@ def getDirection(directionStr):
             cont += 1
     return (e1, float(p1), e2, float(p2))
 
+def createTrip(person, direction):
+    
+    f = open("hashFixedLocations.pickle", "rb")
+    hashFixed = pickle.load(f)
+    f.close()
+    
+    if len(direction) > 9:
+        directiontrip = getDirection(direction)
+    else:
+        directionNode = dictionary.search(hashFixed, direction)
+        if directionNode == None:
+            print("Esta ubicación fija no se encuentra en el mapa.")
+            return
+        directiontrip = getDirection(directionNode[2])
+        
+    f = open("hashMobile.pickle", "rb")
+    hashMovil = pickle.load(f)
+    f.close()
+    
+    personNode = dictionary.search(hashMovil, person)
+    if personNode == None:
+        print("Esta persona no se encuentra en el mapa.")
+        return
+    
+    f.open("mapa.pickle", "rb")
+    map = pickle.load(f)
+    f.close()
+    f.open("hashCorners.pickle", "rb")
+    hashCorners = pickle.load(f)
+    f.close()
+    f.open("cornerDistances.pickle", "rb")
+    priorityQ = pickle.load(f)
+    f.close()
+    
+    ranking = trip.rankingAutos(map,hashCorners,priorityQ,personNode)
+    
+    print(ranking)
+
 """
 Condicionales para manejar los argumentos pasados por consola.
 """
@@ -207,7 +245,7 @@ elif (entrada[0] == "-load_movil_element"):
 
 elif (entrada[0] == "-create_trip"):
     entrada.pop(0)
-
+    createTrip(entrada[0], entrada[1])
 elif (entrada[0] == "-create_map"):
     entrada.pop(0)
     createMap(entrada[0])
