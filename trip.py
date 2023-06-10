@@ -106,7 +106,7 @@ def extractCars(priorityCorners, people, vertice, vertice2):
     if vertice2 == None:
         for i in range(0, 3):
             car = priorityCorners[vertice][i]
-            carAux = (car[1], car[0] + (people[0] / 4))
+            carAux = (car[1], car[0] + (people / 4))
             newList.append(carAux)
         return newList
     else:
