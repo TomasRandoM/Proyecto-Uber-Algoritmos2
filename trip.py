@@ -15,7 +15,7 @@ def insertCar(Graph, carHashTable, priorityCorners, cornerHashTable, auto):
     dictionary.insert(carHashTable, auto, auto[0])
     e1 = dictionary.search(cornerHashTable, auto[1][0])
     e2 = dictionary.search(cornerHashTable, auto[1][2])
-    status = graph.sentidoCalle(e1, e2)
+    status = graph.sentidoCalle(Graph, e1, e2)
     if status == 1:
         distancias, antecesores = graph.dijkstra(Graph, e2)
         car = (auto[0], auto[1][3], auto[2])
@@ -38,24 +38,34 @@ auxiliar "priorityCorners". Utiliza una priorityQueue e inserta en cada espacio 
 """
 def insertPriortyCorners(auto, priorityCorners, distancias1, distancias2):
     if distancias2 == None:
-        for i in range(0, distancias1):
+        for i in range(0, len(distancias1)):
             if priorityCorners[i] == None:
-                newQueue = queue.PriorityQueue()
-                priorityCorners[i] = newQueue
+                priorityCorners[i] = []
             price = (distancias1[i] + auto[1] + auto[2]) / 4
-            priorityCorners[i].put((price, auto[0]))
+            priorityCorners[i] = insertWithPriority(priorityCorners[i], (price, auto[0]))
     else:
-        for i in range(0, distancias1):
+        for i in range(0, len(distancias1)):
             if priorityCorners[i] == None:
-                newQueue = queue.PriorityQueue()
-                priorityCorners[i] = newQueue
+                priorityCorners[i] = []
             if distancias1[i] <= distancias2[i]:
                 price = (distancias1[i] + auto[1] + auto[3]) / 4
-                priorityCorners[i].put((price, auto[0]))
+                priorityCorners[i] = insertWithPriority(priorityCorners[i], (price, auto[0]))
             else:
                 price = (distancias2[i] + auto[2] + auto[3]) / 4
-                priorityCorners[i].put((price, auto[0]))
+                priorityCorners[i] = insertWithPriority(priorityCorners[i], (price, auto[0]))
     return priorityCorners
+
+def insertWithPriority(list1, element):
+    if list1 == []:
+        list1.append(element)
+        return list1
+    for i in range(0, len(list1)):
+        if list1[i][0] >= element[0]:
+            list1.insert(i, element)
+            break
+        if i == len(list1) - 1:
+            list1.append(element)
+    return list1
 
 """
 Inserta una persona en el hash de personas y autos (peopleHashTable), people viene dado de la forma
@@ -73,10 +83,10 @@ la lista (priorityCorners) con las priorityQueue de cada esquina y la persona (p
 Devuelve una lista con los 3 autos más cercanos de la forma:
 [(c1, precio), (c2, precio), (c3, precio)] siedo ci cada auto y precio el valor total a ser abonado.
 """
-def rankingAutos(cornerHash, priorityCorners, people):
+def rankingAutos(Graph, cornerHash, priorityCorners, people):
     e1 = dictionary.search(cornerHash, people[1][0])
     e2 = dictionary.search(cornerHash, people[1][2])
-    status = graph.sentidoCalle(e1, e2)
+    status = graph.sentidoCalle(Graph, e1, e2)
     if status == 1:
         person = (people[1][1])
         cars = extractCars(priorityCorners, person, e1, None)
@@ -95,19 +105,27 @@ def extractCars(priorityCorners, people, vertice, vertice2):
     newList = []
     if vertice2 == None:
         for i in range(0, 3):
-            car = priorityCorners[vertice].get()
+            car = priorityCorners[vertice][i]
             carAux = (car[1], car[0] + (people[0] / 4))
-            newList.append()
+            newList.append(carAux)
+        return newList
     else:
+        auxList = []
         for i in range(0, 3):
-            car1 = priorityCorners[vertice].get()
-            car2 = priorityCorners[vertice2].get()
-            if car1 <= car2:
-                carAux = (car[1], car[0] +  (people[0] / 4))
+            car1 = priorityCorners[vertice].pop(0)
+            car2 = priorityCorners[vertice2].pop(0)
+            dist1 = car1[0] +  (people[0] / 4)
+            dist2 = car2[0] +  (people[1] / 4)
+            if dist1 <= dist2:
+                carAux = (car1[1], car1[0] +  (people[0] / 4))
+                auxList.append((vertice, car1))
                 newList.append(carAux)
-                priorityCorners[vertice2].put(car2)
+                priorityCorners[vertice2] = insertWithPriority(priorityCorners[vertice2], car2)
             else:
-                carAux = (car[1], car[0] +  (people[1] / 4))
+                carAux = (car2[1], car2[0] +  (people[1] / 4))
+                auxList.append((vertice2, car2))
                 newList.append(carAux)
-                priorityCorners[vertice].put(car1)
+                priorityCorners[vertice] = insertWithPriority(priorityCorners[vertice], car2)
+        for i in range(0, len(auxList)):
+            priorityCorners[auxList[i][0]] = insertWithPriority(priorityCorners[auxList[i][0]], [auxList][i][1])
     return newList
