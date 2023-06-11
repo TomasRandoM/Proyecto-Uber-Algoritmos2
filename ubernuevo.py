@@ -199,7 +199,7 @@ def getDirection(directionStr):
             cont += 1
     return (e1, float(p1), e2, float(p2))
 
-def createTrip(person, direction):
+def createTrip(person, direction):  
     f = open("hashFixedLocations.pickle", "rb")
     hashFixed = pickle.load(f)
     f.close()
@@ -237,15 +237,13 @@ def createTrip(person, direction):
     print("OPCIONES | AUTO | COSTO")
     for i in range(3):
         print(i+1 , ".      |", ranking[i][0], "  |", ranking[i][1])
-    print("4. No realizar viaje")
-    print("Monto de dinero de la pesona ", personNode[0], ": ", personNode[2])
+    print("4 . No realizar viaje")
+    print("Monto de dinero de la persona ", personNode[0], ": ", personNode[2])
     print("")
     
-    eleccion = 5
-    while eleccion > 4 or eleccion <= 0:
-        eleccion = int(input("Que opción eliges: "))
-        if eleccion > 4 or eleccion <= 0:
-            print("Opcion invalida, ingrese nuevamente.")
+    eleccion = int(input("Que opción eliges: "))
+    while eleccion not in [1,2,3,4] or eleccion == "":
+        eleccion = int(input("Opción invalida, ingrese nuevamente: "))
     
     if eleccion == 1:
         carselected = ranking[0]
@@ -254,19 +252,35 @@ def createTrip(person, direction):
     elif eleccion == 3:
         carselected = ranking[2]
     elif eleccion == 4:
+        print("Viaje cancelado")
         return
     
-    print("Nodo persona: ", personNode)
-    personNode[1] = directiontrip
-    print("Nodo persona: ", personNode)
+    nuevoMonto = personNode[2] - carselected[1]
+    
+    newPersonNode = (personNode[0], directiontrip, nuevoMonto)
+    hashNewPerson = (personNode[0], newPersonNode)
     
     carNode = dictionary.search(hashMovil, carselected[0])
-    print("Nodo auto: ", carNode)
-    carNode[1] = directiontrip
-    print("Nodo auto: ", carNode)
+    newCarNode = (carNode[0], directiontrip, carNode[2])
+    hashNewCar = (carNode[0], newCarNode)
+    
+    k = dictionary.hashFunction(hashNewPerson[0], len(hashMovil))
+    n = len(hashMovil[k])
+    for i in range(0, n):
+        if hashNewPerson[0] == hashMovil[k][i][0]:
+            hashMovil[k][i] = hashNewPerson
+    
+    r = dictionary.hashFunction(hashNewCar[0], len(hashMovil))
+    for j in range(0, n):
+        if hashNewCar[0] == hashMovil[r][j][0]:
+            hashMovil[r][j] = hashNewCar
+        
+    f = open("hashMobile.pickle", "wb")
+    pickle.dump(hashMovil, f)
+    f.close()
     
     return
-
+    
 """
 Condicionales para manejar los argumentos pasados por consola.
 """
