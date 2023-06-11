@@ -200,7 +200,6 @@ def getDirection(directionStr):
     return (e1, float(p1), e2, float(p2))
 
 def createTrip(person, direction):
-    
     f = open("hashFixedLocations.pickle", "rb")
     hashFixed = pickle.load(f)
     f.close()
@@ -239,7 +238,34 @@ def createTrip(person, direction):
     for i in range(3):
         print(i+1 , ".      |", ranking[i][0], "  |", ranking[i][1])
     print("4. No realizar viaje")
+    print("Monto de dinero de la pesona ", personNode[0], ": ", personNode[2])
+    print("")
     
+    eleccion = 5
+    while eleccion > 4 or eleccion <= 0:
+        eleccion = int(input("Que opción eliges: "))
+        if eleccion > 4 or eleccion <= 0:
+            print("Opcion invalida, ingrese nuevamente.")
+    
+    if eleccion == 1:
+        carselected = ranking[0]
+    elif eleccion == 2:
+        carselected = ranking[1]
+    elif eleccion == 3:
+        carselected = ranking[2]
+    elif eleccion == 4:
+        return
+    
+    print("Nodo persona: ", personNode)
+    personNode[1] = directiontrip
+    print("Nodo persona: ", personNode)
+    
+    carNode = dictionary.search(hashMovil, carselected[0])
+    print("Nodo auto: ", carNode)
+    carNode[1] = directiontrip
+    print("Nodo auto: ", carNode)
+    
+    return
 
 """
 Condicionales para manejar los argumentos pasados por consola.
@@ -253,7 +279,6 @@ elif (entrada[0] == "-load_movil_element"):
     direction = getDirection(entrada[1])
     element = (entrada[0], direction, float(entrada[2]))
     loadMobileElement(element)
-
 elif (entrada[0] == "-create_trip"):
     entrada.pop(0)
     createTrip(entrada[0], entrada[1])
