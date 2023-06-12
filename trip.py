@@ -1,6 +1,5 @@
 import dictionary
 import graph
-import queue
 """
 Inserta el auto en una hashtable (carHashTable) donde van las personas y los autos. Luego, hace un dijkstra desde las esquinas
 cercanas (si la calle es de doble mano) o solo desde donde puede ir. Luego, ubica las distancias en una lista
@@ -125,7 +124,39 @@ def extractCars(priorityCorners, people, vertice, vertice2):
                 carAux = (car2[1], car2[0] +  (people[1] / 4))
                 auxList.append((vertice2, car2))
                 newList.append(carAux)
-                priorityCorners[vertice] = insertWithPriority(priorityCorners[vertice], car2)
+                priorityCorners[vertice] = insertWithPriority(priorityCorners[vertice], car1)
         for i in range(0, len(auxList)):
-            priorityCorners[auxList[i][0]] = insertWithPriority(priorityCorners[auxList[i][0]], [auxList][i][1])
+            priorityCorners[auxList[i][0]] = insertWithPriority(priorityCorners[auxList[i][0]], auxList[i][1])
     return newList
+
+"""
+Función que elimina un auto dado de la lista de prioridad de distancias a cada esquina desde cada auto.
+Luego, calcula la nueva distancia más corta y las vuelve a insertar en la lista de prioridad.
+"""
+def deleteCars(Graph, priorityCorners, car, cornerHashTable, esquinas):
+    n = len(priorityCorners)
+    for i in range (0, n):
+        m = len(priorityCorners[i])
+        for j in range(0, m):
+            if priorityCorners[i][j][0] == car[0]:
+                priorityCorners[i][j].pop(j)
+
+    e1 = dictionary.search(cornerHashTable, car[1][0])
+    e2 = dictionary.search(cornerHashTable, car[1][2])
+    status = graph.sentidoCalle(Graph, e1, e2)
+    if status == 1:
+        distancias, antecesores = graph.dijkstra(Graph, e2)
+        car = (car[0], car[1][3], car[2])
+        insertPriortyCorners(car, priorityCorners, distancias, None, esquinas)
+    elif status == 2:
+        distancias, antecesores = graph.dijkstra(Graph, e1)
+        car = (car[0], car[1][1], car[2])
+        insertPriortyCorners(car, priorityCorners, distancias, None, esquinas)
+    else:
+        distancias, antecesores = graph.dijkstra(Graph, e2)
+        distancias2, antecesores2 = graph.dijkstra(Graph, e1)
+        car = (car[0], car[1][3], car[1][1], car[2])
+        insertPriortyCorners(car, priorityCorners, distancias, distancias2, esquinas)
+        antecesores2.clear()
+    antecesores.clear()
+    return priorityCorners
