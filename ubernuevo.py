@@ -256,13 +256,8 @@ def createTrip(person, direction):
         return
     
     nuevoMonto = personNode[2] - carselected[1]
-    
     newPersonNode = (personNode[0], directiontrip, nuevoMonto)
     hashNewPerson = (personNode[0], newPersonNode)
-    
-    carNode = dictionary.search(hashMovil, carselected[0])
-    newCarNode = (carNode[0], directiontrip, carNode[2])
-    hashNewCar = (carNode[0], newCarNode)
     
     k = dictionary.hashFunction(hashNewPerson[0], len(hashMovil))
     n = len(hashMovil[k])
@@ -270,9 +265,13 @@ def createTrip(person, direction):
         if hashNewPerson[0] == hashMovil[k][i][0]:
             hashMovil[k][i] = hashNewPerson
     
-    r = dictionary.hashFunction(hashNewCar[0], len(hashMovil))
+    r = dictionary.hashFunction(carselected[0], len(hashMovil))
+    n = len(hashMovil[r])
     for j in range(0, n):
-        if hashNewCar[0] == hashMovil[r][j][0]:
+        if carselected[0] == hashMovil[r][j][0]:
+            carNode = hashMovil[r][j][1]
+            newCarNode = (carNode[0], directiontrip, carNode[2])
+            hashNewCar = (carNode[0], newCarNode)
             hashMovil[r][j] = hashNewCar
         
     f = open("hashMobile.pickle", "wb")
