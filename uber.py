@@ -80,9 +80,6 @@ def loadMobileElement(element):
     else:
         print("Objeto mal ingresado")
         return
-    imprimirhash(hashMovil)
-    print("=====")
-    imprimirhash(priorityCorners)
     f = open("hashMobile.pickle", "wb")
     pickle.dump(hashMovil, f)
     f.close()
@@ -141,7 +138,7 @@ def cutMap(fileDir):
         print("Dirección no válida")
     corner = f.readline()
     streets = f.readline()
-    corner = corner.strip("{}E\n=")
+    corner = corner.strip("{E=}\n")
     corner = corner.split(",")
     street = []
     cond = False
@@ -231,7 +228,7 @@ def createTrip(person, direction):
         return
     
     f = open("mapa.pickle", "rb")
-    map = pickle.load(f)
+    mapa = pickle.load(f)
     f.close()
     f = open("hashCorners.pickle", "rb")
     hashCorners = pickle.load(f)
@@ -243,9 +240,9 @@ def createTrip(person, direction):
     esquinas = pickle.load(f)
     f.close()
     
-    graph.shortestPathAux(hashCorners, personNode, directionNode, directiontrip, place)
+    graph.shortestPathAux(mapa, hashCorners, personNode, directionNode, directiontrip, place, esquinas)
 
-    ranking = trip.rankingAutos(map,hashCorners,priorityQ,personNode)
+    ranking = trip.rankingAutos(mapa,hashCorners,priorityQ,personNode)
     
     print("OPCIONES | AUTO | COSTO")
     for i in range(3):
@@ -287,7 +284,7 @@ def createTrip(person, direction):
             hashNewCar = (carNode[0], newCarNode)
             hashMovil[r][j] = hashNewCar
     
-    priorityQ = trip.deleteCars(map, priorityQ, newCarNode, hashCorners, esquinas)
+    priorityQ = trip.deleteCars(mapa, priorityQ, newCarNode, hashCorners, esquinas)
     print("Viaje realizado.")
     f = open("cornerDistances.pickle", "wb")
     pickle.dump(priorityQ, f)

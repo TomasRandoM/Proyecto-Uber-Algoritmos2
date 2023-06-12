@@ -87,47 +87,47 @@ def shortestPath(antecesor, s, esquinas):
 """
 Función auxiliar que verifica el sentido de la calle para mostrar correctamente el camino más corto hacia la ubicación objetivo desde la persona.
 """
-def shortestPathAux(hashCorners, personNode, directionNode, directiontrip, place):
+def shortestPathAux(mapa, hashCorners, personNode, directionNode, directiontrip, place, esquinas):
     e1 = dictionary.search(hashCorners, personNode[1][0])
     e2 = dictionary.search(hashCorners, personNode[1][2])
-    status = sentidoCalle(map, e1, e2)
+    status = sentidoCalle(mapa, e1, e2)
     if status == 1:
-        distancia, ancestros = dijkstra(map, e2)
+        distancia, ancestros = dijkstra(mapa, e2)
     elif status == 2:
-        distancia, ancestros = dijkstra(map, e1)
+        distancia, ancestros = dijkstra(mapa, e1)
     else:
-        distancia, ancestros = dijkstra(map, e1)
-        distancia2, ancestros2 = dijkstra(map, e2)
+        distancia, ancestros = dijkstra(mapa, e1)
+        distancia2, ancestros2 = dijkstra(mapa, e2)
 
     print("El camino más corto es:")
     if place == True:
         if status != 3:
-            print(shortestPath(ancestros, directionNode[1]))
+            print(shortestPath(ancestros, directionNode[1], esquinas))
         else:
             if distancia[directionNode[1]] <= distancia2[directionNode[1]]:
-                print(shortestPath(ancestros, directionNode[1]))
+                print(shortestPath(ancestros, directionNode[1], esquinas))
             else:
-                print(shortestPath(ancestros2, directionNode[1]))
+                print(shortestPath(ancestros2, directionNode[1], esquinas))
     else:
         e1 = dictionary.search(hashCorners, directiontrip[0])
         e2 = dictionary.search(hashCorners, directiontrip[2])
-        status2 = sentidoCalle(map, directiontrip[0], directiontrip[2])
+        status2 = sentidoCalle(mapa, e1, e2)
         if status2 != 3:
             if status2 == 2:
                 e1 = e2
             if status != 3:
-                print(shortestPath(ancestros, e1))
+                print(shortestPath(ancestros, e1, esquinas))
             else:
                 if distancia[e1] <= distancia2[e1]:
-                    print(shortestPath(ancestros, e1))
+                    print(shortestPath(ancestros, e1, esquinas))
                 else:
-                    print(shortestPath(ancestros2, e1))
+                    print(shortestPath(ancestros2, e1, esquinas))
         else:
             if status != 3:
                 if distancia[e1] <= distancia[e2]:
-                    print(shortestPath(ancestros, e1))
+                    print(shortestPath(ancestros, e1, esquinas))
                 else:
-                    print(shortestPath(ancestros, e2))
+                    print(shortestPath(ancestros, e2, esquinas))
             else:
                 if distancia[e1] <= distancia2[e1]:
                     dist1 = (distancia[e1], 1, e1) 
@@ -142,9 +142,9 @@ def shortestPathAux(hashCorners, personNode, directionNode, directiontrip, place
                 else:
                     definitivo = dist2
                 if definitivo[1] == 1:
-                    print(shortestPath(ancestros, definitivo[2]))
+                    print(shortestPath(ancestros, definitivo[2], esquinas))
                 else:
-                    print(shortestPath(ancestros2, definitivo[2]))
+                    print(shortestPath(ancestros2, definitivo[2], esquinas))
     ancestros.clear()
     distancia.clear()
     return
@@ -216,10 +216,7 @@ def recorrerArista(Graph, direc, newVertex, e1, e2, nextVertex, status, first):
                 return recorrerArista(Graph, direc, newVertex, e1, e2, list1[i].value, status, 0)
             else:
                 vertex = Graph[nextVertex].pop(i)
-                if status == 2:
-                    vertex.dist = abs(vertex.dist - direc[2][1])
-                else:
-                    vertex.dist = abs(vertex.dist - direc[2][3])
+                vertex.dist = abs(vertex.dist - newVertex.dist)
                 Graph[nextVertex].insert(0, newVertex)
                 Graph[k].append(vertex)
                 return Graph
