@@ -17,14 +17,18 @@ def insertCar(Graph, carHashTable, priorityCorners, cornerHashTable, auto, esqui
     e2 = dictionary.search(cornerHashTable, auto[1][2])
     status = graph.sentidoCalle(Graph, e1, e2)
     if status == 1:
+        esquinas[e1].append((e2, auto))
         distancias, antecesores = graph.dijkstra(Graph, e2)
         car = (auto[0], auto[1][3], auto[2])
         insertPriortyCorners(car, priorityCorners, distancias, None, esquinas)
     elif status == 2:
+        esquinas[e2].append((e1, auto))
         distancias, antecesores = graph.dijkstra(Graph, e1)
         car = (auto[0], auto[1][1], auto[2])
         insertPriortyCorners(car, priorityCorners, distancias, None, esquinas)
     else:
+        esquinas[e1].append((e2, auto))
+        esquinas[e2].append((e1, auto))
         distancias, antecesores = graph.dijkstra(Graph, e2)
         distancias2, antecesores2 = graph.dijkstra(Graph, e1)
         car = (auto[0], auto[1][3], auto[1][1], auto[2])
@@ -83,25 +87,25 @@ la lista (priorityCorners) con las priorityQueue de cada esquina y la persona (p
 Devuelve una lista con los 3 autos más cercanos de la forma:
 [(c1, precio), (c2, precio), (c3, precio)] siedo ci cada auto y precio el valor total a ser abonado.
 """
-def rankingAutos(Graph, cornerHash, priorityCorners, people):
+def rankingAutos(Graph, cornerHash, priorityCorners, people, corners):
     e1 = dictionary.search(cornerHash, people[1][0])
     e2 = dictionary.search(cornerHash, people[1][2])
     status = graph.sentidoCalle(Graph, e1, e2)
     if status == 1:
         person = (people[2], people[1][1])
-        cars = extractCars(priorityCorners, person, e1, None)
+        cars = extractCars(priorityCorners, person, e1, None, corners, e1)
     elif status == 2:
         person = (people[2], people[1][3])
-        cars = extractCars(priorityCorners, person, e2, None)
+        cars = extractCars(priorityCorners, person, e2, None, corners, e2)
     else:
         person = (people[2], people[1][1], people[1][3])
-        cars = extractCars(priorityCorners, person, e1, e2)
+        cars = extractCars(priorityCorners, person, e1, e2, corners, None)
     return cars
 
 """
 Función auxiliar que devuelve la lista con los 3 autos más cercanos.
 """
-def extractCars(priorityCorners, people, vertice, vertice2):
+def extractCars(priorityCorners, people, vertice, vertice2, corners, enext):
     newList = []
     if vertice2 == None:
         m = len(priorityCorners[vertice])
@@ -114,6 +118,24 @@ def extractCars(priorityCorners, people, vertice, vertice2):
             if price > people[0]:
                 break
             newList.append(carAux)
+        m = len(corners[vertice])
+        if m > 1:
+            for i in range(1, m):
+                if (corners[vertice][i][0] == enext):
+                    aux = corners[vertice][i][1]
+                    if corners[vertice][0] == aux[1][0]:
+                        dist = aux[1][1]
+                    else:
+                        dist = aux[1][3]
+                    if dist <= people[1]:
+                        price = ((people[1] - dist) + aux[2]) / 4
+                    n = len(newList)
+                    if n == 0:
+                        if (people[0] >= price):
+                            newList.append((aux[0], price))
+                    else:
+                        if price <= newList[n-1][1]:
+                            insertWithPriorityAux(newList, (aux[0], price))
         return newList
     else:
         auxList = []
@@ -157,6 +179,23 @@ def extractCars(priorityCorners, people, vertice, vertice2):
                     priorityCorners[vertice] = insertWithPriority(priorityCorners[vertice], car1)
         for i in range(0, len(auxList)):
             priorityCorners[auxList[i][0]] = insertWithPriority(priorityCorners[auxList[i][0]], auxList[i][1])
+        m = len(corners[vertice])
+        for i in range(1, m):
+            if (corners[vertice][i][0] == vertice2):
+                aux = corners[vertice][i][1]
+                if corners[vertice][0] == aux[1][0]:
+                    dist = aux[1][1]
+                else:
+                    dist = aux[1][3]
+                if dist <= people[1]:
+                    price = (abs((people[1] - dist)) + aux[2]) / 4
+                n = len(newList)
+                if n == 0:
+                    if (people[0] >= price):
+                        newList.append((aux[0], price))
+                else:
+                    if price <= newList[n-1][1]:
+                        insertWithPriorityAux(newList, (aux[0], price))
     return newList
 
 """
@@ -174,10 +213,12 @@ def deleteCars(Graph, priorityCorners, car, cornerHashTable, esquinas):
     e2 = dictionary.search(cornerHashTable, car[1][2])
     status = graph.sentidoCalle(Graph, e1, e2)
     if status == 1:
+        vertice = e1
         distancias, antecesores = graph.dijkstra(Graph, e2)
         car = (car[0], car[1][3], car[2])
         insertPriortyCorners(car, priorityCorners, distancias, None, esquinas)
     elif status == 2:
+        vertice = e2
         distancias, antecesores = graph.dijkstra(Graph, e1)
         car = (car[0], car[1][1], car[2])
         insertPriortyCorners(car, priorityCorners, distancias, None, esquinas)
@@ -188,4 +229,36 @@ def deleteCars(Graph, priorityCorners, car, cornerHashTable, esquinas):
         insertPriortyCorners(car, priorityCorners, distancias, distancias2, esquinas)
         antecesores2.clear()
     antecesores.clear()
+    if status != 3:
+        for i in range(1, len(esquinas[vertice])):
+            if esquinas[vertice][i][1][0] == car[0]:
+                esquinas[vertice].pop(i)
+                break
+    else:
+        for i in range(1, len(esquinas[e1])):
+            if esquinas[e1][i][1][0] == car[0]:
+                esquinas[e1].pop(i)
+                break
+        for i in range(1, len(esquinas[e2])):
+            if esquinas[e2][i][1][0] == car[0]:
+                esquinas[e2].pop(i)
+                break
     return priorityCorners
+
+"""Función auxiliar para extractCars. Inserta con prioridad en la lista resultante. Element viene dado
+de la forma (car, precio)"""
+def insertWithPriorityAux(list1, element):
+    if len(list1) == 3:
+        complete = True
+    else:
+        complete = False
+    for i in range(0, len(list1)):
+        if list1[i][0] == element[0]:
+            list1.pop(i)
+            break
+    for i in range(0, len(list1)):
+        if list1[i][1] < element[1]:
+            if complete == True:
+                list1.pop(len(list1) - 1)
+            list1.insert(i, element)
+    return list1

@@ -75,6 +75,9 @@ def loadMobileElement(element):
     f.close()
     if element[0][0] == "C":
         hashMovil = trip.insertCar(mapa, hashMovil, priorityCorners, hashEsquinas, element, esquinas)
+        f = open("corners.pickle", "wb")
+        pickle.dump(esquinas, f)
+        f.close()
     elif element[0][0] == "P":
         hashMovil = trip.insertPeople(hashMovil, element)
     else:
@@ -105,6 +108,8 @@ def createMap(fileDir):
     hashDirFijas = dictionary.dictionary(len(theMap))
     hashMobile = dictionary.dictionary(len(theMap))
     cornerDistances = [None] * len(theMap)
+    for i in range(len(corners)):
+        corners[i] = [corners[i]]
     f = open("corners.pickle", "wb")
     pickle.dump(corners, f)
     f.close()
@@ -240,10 +245,13 @@ def createTrip(person, direction):
     f = open("corners.pickle", "rb")
     esquinas = pickle.load(f)
     f.close()
-    
+    print("HASH PRIORITY =============")
+    imprimirhash(priorityQ)
+    print("HASH MOVIL =============")
+    imprimirhash(hashMovil)
     graph.shortestPathAux(mapa, hashCorners, personNode, directionNode, directiontrip, place, esquinas)
 
-    ranking = trip.rankingAutos(mapa,hashCorners,priorityQ,personNode)
+    ranking = trip.rankingAutos(mapa,hashCorners,priorityQ,personNode, esquinas)
     m = len(ranking)
     print("OPCIONES | AUTO | COSTO")
     for i in range(m):
@@ -292,7 +300,9 @@ def createTrip(person, direction):
     f = open("hashMobile.pickle", "wb")
     pickle.dump(hashMovil, f)
     f.close()
-    
+    f = open("corners.pickle", "wb")
+    pickle.dump(esquinas, f)
+    f.close()
     return
     
 """
