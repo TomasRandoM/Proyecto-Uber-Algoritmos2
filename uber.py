@@ -210,6 +210,7 @@ def createTrip(person, direction):
     place = False
     if len(direction) > 9:
         directiontrip = getDirection(direction)
+        directionNode = None
     else:
         place = True
         directionNode = dictionary.search(hashFixed, direction)
@@ -243,9 +244,9 @@ def createTrip(person, direction):
     graph.shortestPathAux(mapa, hashCorners, personNode, directionNode, directiontrip, place, esquinas)
 
     ranking = trip.rankingAutos(mapa,hashCorners,priorityQ,personNode)
-    
+    m = len(ranking)
     print("OPCIONES | AUTO | COSTO")
-    for i in range(3):
+    for i in range(m):
         print(i+1 , ".      |", ranking[i][0], "  |", ranking[i][1])
     print("4 . No realizar viaje")
     print("Monto de dinero de la persona ", personNode[0], ": ", personNode[2])
@@ -254,7 +255,6 @@ def createTrip(person, direction):
     eleccion = int(input("Que opción eliges: "))
     while eleccion not in [1,2,3,4] or eleccion == "":
         eleccion = int(input("Opción invalida, ingrese nuevamente: "))
-    
     if eleccion == 1:
         carselected = ranking[0]
     elif eleccion == 2:
@@ -262,7 +262,7 @@ def createTrip(person, direction):
     elif eleccion == 3:
         carselected = ranking[2]
     elif eleccion == 4:
-        print("Viaje cancelado")
+        print("Trip cancelled")
         return
     
     nuevoMonto = personNode[2] - carselected[1]
@@ -285,7 +285,7 @@ def createTrip(person, direction):
             hashMovil[r][j] = hashNewCar
     
     priorityQ = trip.deleteCars(mapa, priorityQ, newCarNode, hashCorners, esquinas)
-    print("Viaje realizado.")
+    print("Trip confirmed.")
     f = open("cornerDistances.pickle", "wb")
     pickle.dump(priorityQ, f)
     f.close()
