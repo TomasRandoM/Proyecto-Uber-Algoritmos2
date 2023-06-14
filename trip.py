@@ -290,10 +290,6 @@ def deleteCars(Graph, priorityCorners, car, oldcar, cornerHashTable, esquinas):
 """Función auxiliar para extractCars. Inserta con prioridad en la lista resultante. Element viene dado
 de la forma (car, precio)"""
 def insertWithPriorityAux(list1, element):
-    if len(list1) == 3:
-        complete = True
-    else:
-        complete = False
     for i in range(0, len(list1)):
         if list1[i][0] == element[0]:
             if list1[i][1] > element[1]:
@@ -301,6 +297,10 @@ def insertWithPriorityAux(list1, element):
                 break
             else:
                 return list1
+    if len(list1) == 3:
+        complete = True
+    else:
+        complete = False
     for i in range(0, len(list1)):
         if list1[i][1] > element[1]:
             if complete == True:
