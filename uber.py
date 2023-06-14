@@ -212,6 +212,10 @@ def createTrip(person, direction):
     hashFixed = pickle.load(f)
     f.close()
     
+    if person[0] != "P":
+        print("The value entered for the person is invalid.")
+        return
+    
     place = False
     if len(direction) > 9:
         directiontrip = getDirection(direction)
@@ -220,7 +224,7 @@ def createTrip(person, direction):
         place = True
         directionNode = dictionary.search(hashFixed, direction)
         if directionNode == None:
-            print("Esta ubicación fija no se encuentra en el mapa.")
+            print("This fixed location is not on the map.")
             return
         directiontrip = directionNode[2]
         
@@ -230,7 +234,7 @@ def createTrip(person, direction):
     
     personNode = dictionary.search(hashMovil, person)
     if personNode == None:
-        print("Esta persona no se encuentra en el mapa.")
+        print("This person is not on the map.")
         return
     
     f = open("mapa.pickle", "rb")
@@ -250,16 +254,16 @@ def createTrip(person, direction):
 
     ranking = trip.rankingAutos(mapa,hashCorners,priorityQ,personNode, esquinas)
     m = len(ranking)
-    print("OPCIONES | AUTO | COSTO")
+    print("Options | Cars | Cost")
     for i in range(m):
         print(i+1 , ".      |", ranking[i][0], "  |", ranking[i][1])
-    print("4 . No realizar viaje")
-    print("Monto de dinero de la persona ", personNode[0], ": ", personNode[2])
+    print("4 . Do not travel")
+    print("Amount of money of the person ", personNode[0], ": ", personNode[2])
     print("")
     
-    eleccion = int(input("Que opción eliges: "))
+    eleccion = int(input("Which option do you choose: "))
     while eleccion not in [1,2,3,4] or eleccion == "":
-        eleccion = int(input("Opción invalida, ingrese nuevamente: "))
+        eleccion = int(input("Invalid option, choose again: "))
     if eleccion == 1:
         carselected = ranking[0]
     elif eleccion == 2:
