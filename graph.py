@@ -99,7 +99,7 @@ def shortestPathAux(mapa, hashCorners, personNode, directionNode, directiontrip,
         distancia, ancestros = dijkstra(mapa, e1)
         distancia2, ancestros2 = dijkstra(mapa, e2)
 
-    print("El camino más corto es:")
+    print("The shortest path is:")
     if place == True:
         if status != 3:
             print(shortestPath(ancestros, directionNode[1], esquinas))
