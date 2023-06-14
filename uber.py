@@ -254,15 +254,17 @@ def createTrip(person, direction):
 
     ranking = trip.rankingAutos(mapa,hashCorners,priorityQ,personNode, esquinas)
     m = len(ranking)
+    options = [4]
     print("Options | Cars | Cost")
     for i in range(m):
         print(i+1 , ".      |", ranking[i][0], "  |", ranking[i][1])
+        options.append(i+1)
     print("4 . Do not travel")
     print("Amount of money of the person ", personNode[0], ": ", personNode[2])
     print("")
     
     eleccion = int(input("Which option do you choose: "))
-    while eleccion not in [1,2,3,4] or eleccion == "":
+    while eleccion not in options or eleccion == "":
         eleccion = int(input("Invalid option, choose again: "))
     if eleccion == 1:
         carselected = ranking[0]
