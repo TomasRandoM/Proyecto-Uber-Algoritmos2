@@ -80,7 +80,7 @@ def shortestPath(antecesor, s, esquinas):
     n = len(esquinas)
     while s != None:
         if s < n:
-            shortPath.insert(0, esquinas[s])
+            shortPath.insert(0, esquinas[s][0])
         s = antecesor[s]
     return shortPath
 

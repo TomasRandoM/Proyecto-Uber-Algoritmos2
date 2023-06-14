@@ -93,10 +93,10 @@ def rankingAutos(Graph, cornerHash, priorityCorners, people, corners):
     status = graph.sentidoCalle(Graph, e1, e2)
     if status == 1:
         person = (people[2], people[1][1])
-        cars = extractCars(priorityCorners, person, e1, None, corners, e1)
+        cars = extractCars(priorityCorners, person, e1, None, corners, e2)
     elif status == 2:
         person = (people[2], people[1][3])
-        cars = extractCars(priorityCorners, person, e2, None, corners, e2)
+        cars = extractCars(priorityCorners, person, e2, None, corners, e1)
     else:
         person = (people[2], people[1][1], people[1][3])
         cars = extractCars(priorityCorners, person, e1, e2, corners, None)
@@ -168,15 +168,21 @@ def extractCars(priorityCorners, people, vertice, vertice2, corners, enext):
                         break
                     carAux = (car1[1], car1[0] +  (people[1] / 4))
                     auxList.append((vertice, car1))
-                    newList.append(carAux)
-                    priorityCorners[vertice2] = insertWithPriority(priorityCorners[vertice2], car2)
+                    newList = checkReplace(newList, carAux)
+                    if car1[1] != car2[1]:
+                        priorityCorners[vertice2] = insertWithPriority(priorityCorners[vertice2], car2)
+                    else:
+                        auxList.append((vertice2, car2))
                 else:
                     if dist2 > people[0]:
                         break
                     carAux = (car2[1], car2[0] +  (people[2] / 4))
                     auxList.append((vertice2, car2))
-                    newList.append(carAux)
-                    priorityCorners[vertice] = insertWithPriority(priorityCorners[vertice], car1)
+                    newList = checkReplace(newList, carAux)
+                    if car1[1] != car2[1]:
+                        priorityCorners[vertice] = insertWithPriority(priorityCorners[vertice], car1)
+                    else:
+                        auxList.append((vertice, car1))
         for i in range(0, len(auxList)):
             priorityCorners[auxList[i][0]] = insertWithPriority(priorityCorners[auxList[i][0]], auxList[i][1])
         m = len(corners[vertice])
@@ -199,50 +205,86 @@ def extractCars(priorityCorners, people, vertice, vertice2, corners, enext):
     return newList
 
 """
+Función auxiliar para verificar que un elemento esté en la lista o no. En el caso de estar, verificar que sea posible su
+reemplazo. Se devuelve la lista modificada.
+"""
+def checkReplace(list1, element):
+    if len(list1) == 0:
+        list1.append(element)
+        return list1
+    else:
+        m = len(list1)
+        for i in range(0, m):
+            if list1[i][0] == element[0]:
+                if list1[i][1] > element[1]:
+                    list1.pop(i)
+                    list1.insert(i, element)
+                return list1
+        list1.append(element)
+    return list1
+
+"""
 Función que elimina un auto dado de la lista de prioridad de distancias a cada esquina desde cada auto.
 Luego, calcula la nueva distancia más corta y las vuelve a insertar en la lista de prioridad.
 """
-def deleteCars(Graph, priorityCorners, car, cornerHashTable, esquinas):
+def deleteCars(Graph, priorityCorners, car, oldcar, cornerHashTable, esquinas):
     n = len(priorityCorners)
     for i in range (0, n):
         m = len(priorityCorners[i])
         for j in range(0, m):
             if priorityCorners[i][j][1] == car[0]:
                 priorityCorners[i].pop(j)
+                break
     e1 = dictionary.search(cornerHashTable, car[1][0])
     e2 = dictionary.search(cornerHashTable, car[1][2])
     status = graph.sentidoCalle(Graph, e1, e2)
+    
     if status == 1:
         vertice = e1
+        carAux = (e2, (car))
+        esquinas[e1].append(carAux)
         distancias, antecesores = graph.dijkstra(Graph, e2)
         car = (car[0], car[1][3], car[2])
         insertPriortyCorners(car, priorityCorners, distancias, None, esquinas)
     elif status == 2:
         vertice = e2
+        carAux = (e1, (car))
+        esquinas[e2].append(carAux)
         distancias, antecesores = graph.dijkstra(Graph, e1)
         car = (car[0], car[1][1], car[2])
         insertPriortyCorners(car, priorityCorners, distancias, None, esquinas)
     else:
+        carAux = (e2, (car))
+        esquinas[e1].append(carAux)
+        carAux = (e1, (car))
+        esquinas[e2].append(carAux)
         distancias, antecesores = graph.dijkstra(Graph, e2)
         distancias2, antecesores2 = graph.dijkstra(Graph, e1)
         car = (car[0], car[1][3], car[1][1], car[2])
         insertPriortyCorners(car, priorityCorners, distancias, distancias2, esquinas)
         antecesores2.clear()
     antecesores.clear()
+    e3 = dictionary.search(cornerHashTable, oldcar[1][0])
+    e4 = dictionary.search(cornerHashTable, oldcar[1][2])
+    status = graph.sentidoCalle(Graph, e3, e4)
+    if status == 1:
+        vertice = e3
+    elif status == 2:
+        vertice = e4
     if status != 3:
         for i in range(1, len(esquinas[vertice])):
-            if esquinas[vertice][i][1][0] == car[0]:
+            if esquinas[vertice][i][1][0] == oldcar[0]:
                 esquinas[vertice].pop(i)
                 break
     else:
-        for i in range(1, len(esquinas[e1])):
-            if esquinas[e1][i][1][0] == car[0]:
-                esquinas[e1].pop(i)
-                break
-        for i in range(1, len(esquinas[e2])):
-            if esquinas[e2][i][1][0] == car[0]:
-                esquinas[e2].pop(i)
-                break
+        for i in range(1, len(esquinas[e3])):
+                if esquinas[e3][i][1][0] == oldcar[0]:
+                    esquinas[e3].pop(i)
+                    break
+        for i in range(1, len(esquinas[e4])):
+                if esquinas[e4][i][1][0] == oldcar[0]:
+                    esquinas[e4].pop(i)
+                    break
     return priorityCorners
 
 """Función auxiliar para extractCars. Inserta con prioridad en la lista resultante. Element viene dado
@@ -254,11 +296,17 @@ def insertWithPriorityAux(list1, element):
         complete = False
     for i in range(0, len(list1)):
         if list1[i][0] == element[0]:
-            list1.pop(i)
-            break
+            if list1[i][1] > element[1]:
+                list1.pop(i)
+                break
+            else:
+                return list1
     for i in range(0, len(list1)):
-        if list1[i][1] < element[1]:
+        if list1[i][1] > element[1]:
             if complete == True:
                 list1.pop(len(list1) - 1)
             list1.insert(i, element)
+            return list1
+    if len(list1) < 3:
+        list1.append(element)
     return list1

@@ -245,10 +245,7 @@ def createTrip(person, direction):
     f = open("corners.pickle", "rb")
     esquinas = pickle.load(f)
     f.close()
-    print("HASH PRIORITY =============")
-    imprimirhash(priorityQ)
-    print("HASH MOVIL =============")
-    imprimirhash(hashMovil)
+
     graph.shortestPathAux(mapa, hashCorners, personNode, directionNode, directiontrip, place, esquinas)
 
     ranking = trip.rankingAutos(mapa,hashCorners,priorityQ,personNode, esquinas)
@@ -273,6 +270,7 @@ def createTrip(person, direction):
         print("Trip cancelled")
         return
     
+    oldcar = dictionary.search(hashMovil, carselected[0])
     nuevoMonto = personNode[2] - carselected[1]
     newPersonNode = (personNode[0], directiontrip, nuevoMonto)
     hashNewPerson = (personNode[0], newPersonNode)
@@ -292,7 +290,7 @@ def createTrip(person, direction):
             hashNewCar = (carNode[0], newCarNode)
             hashMovil[r][j] = hashNewCar
     
-    priorityQ = trip.deleteCars(mapa, priorityQ, newCarNode, hashCorners, esquinas)
+    priorityQ = trip.deleteCars(mapa, priorityQ, newCarNode, oldcar, hashCorners, esquinas)
     print("Trip confirmed.")
     f = open("cornerDistances.pickle", "wb")
     pickle.dump(priorityQ, f)
