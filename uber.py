@@ -244,6 +244,11 @@ def createTrip(person, direction):
         print("This person is not on the map.")
         return
     
+    inPlace = verifyInPlace(directiontrip, personNode[1])
+    if inPlace == True:
+        print("Person is already at destiny")
+        return
+    
     f = open("mapa.pickle", "rb")
     mapa = pickle.load(f)
     f.close()
@@ -265,6 +270,7 @@ def createTrip(person, direction):
     else:
         print("The shortest path is: ")
         print(shortestPath)
+
     ranking = trip.rankingAutos(mapa,hashCorners,priorityQ,personNode, esquinas)
     if ranking == []:
         print("Cars are unable to reach the person. Trip cancelled")
@@ -314,6 +320,7 @@ def createTrip(person, direction):
     
     priorityQ = trip.deleteCars(mapa, priorityQ, newCarNode, oldcar, hashCorners, esquinas)
     print("Trip confirmed.")
+    
     f = open("cornerDistances.pickle", "wb")
     pickle.dump(priorityQ, f)
     f.close()
@@ -325,6 +332,26 @@ def createTrip(person, direction):
     f.close()
     return
 
+def verifyInPlace(dir1, dir2):
+    if dir1[0] == dir2[0]:
+        if dir1[2] == dir2[2]:
+            if (dir1[1] == dir2[1]) and (dir1[3] == dir2[3]):
+                return True
+            else:
+                return False
+        else:
+            return False
+    elif dir1[0] == dir2[2]:
+        if dir1[2] == dir2[0]:
+            if (dir1[1] == dir2[3]) and (dir1[3] == dir2[1]):
+                return True
+            else: 
+                return False
+        else:
+            return False
+    else:
+        return False
+        
 """
 Función que recibe una ubicación móvil o fija mediante el comando "-getDirection". Imprime la dirección asociada a ese elemento o avisa que
 el elemento no se encuentra, en caso de no estar.

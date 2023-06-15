@@ -108,6 +108,8 @@ Función auxiliar que devuelve la lista con los 3 autos más cercanos.
 def extractCars(priorityCorners, people, vertice, vertice2, corners, enext):
     newList = []
     if vertice2 == None:
+        if priorityCorners[vertice] == None:
+            return newList
         m = len(priorityCorners[vertice])
         if m >= 3:
             m = 3
