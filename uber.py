@@ -262,14 +262,18 @@ def createTrip(person, direction):
     esquinas = pickle.load(f)
     f.close()
 
-    shortestPath = graph.shortestPathAux(mapa, hashCorners, personNode, directionNode, directiontrip, place, esquinas)
-    if shortestPath == []:
-        print("The location is unreacheable")
-        print("Trip cancelled.")
-        return
+    sameStreet = verifySameStreet(mapa, hashCorners, personNode[1], directiontrip)
+    if sameStreet == True:
+        print("The shortest path is: the same street")
     else:
-        print("The shortest path is: ")
-        print(shortestPath)
+        shortestPath = graph.shortestPathAux(mapa, hashCorners, personNode, directionNode, directiontrip, place, esquinas)
+        if shortestPath == []:
+            print("The location is unreacheable")
+            print("Trip cancelled.")
+            return
+        else:
+            print("The shortest path is: ")
+            print(shortestPath)
 
     ranking = trip.rankingAutos(mapa,hashCorners,priorityQ,personNode, esquinas)
     if ranking == []:
@@ -332,6 +336,9 @@ def createTrip(person, direction):
     f.close()
     return
 
+"""
+Función que verifica que dos direcciones sean iguales. Devuelve True si lo son, False si no.
+"""
 def verifyInPlace(dir1, dir2):
     if dir1[0] == dir2[0]:
         if dir1[2] == dir2[2]:
@@ -351,7 +358,45 @@ def verifyInPlace(dir1, dir2):
             return False
     else:
         return False
-        
+
+"""
+Función que verifica que la ubicación destino este en la misma calle que la persona (En el mismo sentido). Devuelve True si es así,
+false si no.
+"""
+def verifySameStreet(Graph, hashCorners, dir1, dir2):
+    if dir1[0] == dir2[0]:
+        if dir1[2] == dir2[2]:
+            e1 = dir1[0]
+            e2 = dir2[2]
+            aux = (dir1[1], dir2[1], dir1[3], dir2[3])
+        else:
+            return False
+    elif dir1[0] == dir2[2]:
+        if dir1[2] == dir2[0]:
+            e1 = dir1[0]
+            e2 = dir2[0]
+            aux = (dir1[1], dir2[3], dir1[3], dir2[1])
+        else:
+            return False
+    else:
+        return False
+    e1 = dictionary.search(hashCorners, e1)
+    e2 = dictionary.search(hashCorners, e2)
+    status = graph.sentidoCalle(Graph, e1, e2)
+    if status == 1:
+        if (aux[1] - aux[0]) > 0:
+            return True
+        else:
+            return False
+    elif status == 2:
+        if (aux[3] - aux[2]) > 0:
+            return True
+        else:
+            return False
+    else:
+        return True
+    return False
+
 """
 Función que recibe una ubicación móvil o fija mediante el comando "-getDirection". Imprime la dirección asociada a ese elemento o avisa que
 el elemento no se encuentra, en caso de no estar.
