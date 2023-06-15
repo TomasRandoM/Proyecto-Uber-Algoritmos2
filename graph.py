@@ -75,10 +75,10 @@ def dijkstra(Graph, s):
 shortestPath utiliza la lista calculada por dijkstra (antecesor) y un vértice s. Devuelve una lista con los vértices que forman
 el camino más corto entre s y el vértice utilizado para calcular dijkstra.
 """
-def shortestPath(antecesor, s, esquinas):
+def shortestPath(antecesor, s, esquinas, distancias):
     shortPath = []
     n = len(esquinas)
-    if antecesor[s] == None:
+    if distancias[s] == math.inf:
         return shortPath
     while s != None:
         if s < n:
@@ -102,12 +102,12 @@ def shortestPathAux(mapa, hashCorners, personNode, directionNode, directiontrip,
         distancia2, ancestros2 = dijkstra(mapa, e2)
     if place == True:
         if status != 3:
-            return (shortestPath(ancestros, directionNode[1], esquinas))
+            return (shortestPath(ancestros, directionNode[1], esquinas, distancia))
         else:
             if distancia[directionNode[1]] <= distancia2[directionNode[1]]:
-                return (shortestPath(ancestros, directionNode[1], esquinas))
+                return (shortestPath(ancestros, directionNode[1], esquinas, distancia))
             else:
-                return (shortestPath(ancestros2, directionNode[1], esquinas))
+                return (shortestPath(ancestros2, directionNode[1], esquinas, distancia2))
     else:
         e1 = dictionary.search(hashCorners, directiontrip[0])
         e2 = dictionary.search(hashCorners, directiontrip[2])
@@ -116,18 +116,18 @@ def shortestPathAux(mapa, hashCorners, personNode, directionNode, directiontrip,
             if status2 == 2:
                 e1 = e2
             if status != 3:
-                return (shortestPath(ancestros, e1, esquinas))
+                return (shortestPath(ancestros, e1, esquinas, distancia))
             else:
                 if distancia[e1] <= distancia2[e1]:
-                    return (shortestPath(ancestros, e1, esquinas))
+                    return (shortestPath(ancestros, e1, esquinas, distancia))
                 else:
-                    return (shortestPath(ancestros2, e1, esquinas))
+                    return (shortestPath(ancestros2, e1, esquinas, distancia2))
         else:
             if status != 3:
                 if distancia[e1] <= distancia[e2]:
-                    return (shortestPath(ancestros, e1, esquinas))
+                    return (shortestPath(ancestros, e1, esquinas, distancia))
                 else:
-                    return (shortestPath(ancestros, e2, esquinas))
+                    return (shortestPath(ancestros, e2, esquinas, distancia))
             else:
                 if distancia[e1] <= distancia2[e1]:
                     dist1 = (distancia[e1], 1, e1) 
@@ -142,9 +142,9 @@ def shortestPathAux(mapa, hashCorners, personNode, directionNode, directiontrip,
                 else:
                     definitivo = dist2
                 if definitivo[1] == 1:
-                    return (shortestPath(ancestros, definitivo[2], esquinas))
+                    return (shortestPath(ancestros, definitivo[2], esquinas, distancia))
                 else:
-                    return (shortestPath(ancestros2, definitivo[2], esquinas))
+                    return (shortestPath(ancestros2, definitivo[2], esquinas, distancia2))
     return
 """
 Función que inserta una ubicación FIJA en el grafo. Recibe el Grafo, la hashTable correspondiente a las ubicaciones fijas, la hashtable correspondiente

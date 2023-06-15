@@ -277,7 +277,7 @@ def createTrip(person, direction):
 
     ranking = trip.rankingAutos(mapa,hashCorners,priorityQ,personNode, esquinas)
     if ranking == []:
-        print("Cars are unable to reach the person. Trip cancelled")
+        print("Cars are unable to reach the person or Person does not have enough balance. Trip cancelled")
         return
     m = len(ranking)
     options = [4]
