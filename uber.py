@@ -1,3 +1,4 @@
+#Tomás Rando (14004) y Matías Quesada (14003)
 import sys
 import pickle
 import graph
@@ -38,6 +39,9 @@ def loadFixElement(entrada):
     f = open("mapa.pickle", "rb")
     mapa = pickle.load(f)
     f.close()
+    if dictionary.search(hashFixLocs, entrada[0]) != None:
+        print("Location already on the map")
+        return
     mapa = graph.insert(mapa, hashFixLocs, esquinas, element)
     f = open("mapa.pickle", "wb")
     pickle.dump(mapa, f)
@@ -64,6 +68,9 @@ def loadMobileElement(element):
     f = open("hashMobile.pickle", "rb")
     hashMovil = pickle.load(f)
     f.close()
+    if dictionary.search(hashMovil, element[0]) != None:
+        print("Element already on the map")
+        return
     f = open("cornerDistances.pickle", "rb")
     priorityCorners = pickle.load(f)
     f.close()
@@ -250,9 +257,18 @@ def createTrip(person, direction):
     esquinas = pickle.load(f)
     f.close()
 
-    graph.shortestPathAux(mapa, hashCorners, personNode, directionNode, directiontrip, place, esquinas)
-
+    shortestPath = graph.shortestPathAux(mapa, hashCorners, personNode, directionNode, directiontrip, place, esquinas)
+    if shortestPath == []:
+        print("The location is unreacheable")
+        print("Trip cancelled.")
+        return
+    else:
+        print("The shortest path is: ")
+        print(shortestPath)
     ranking = trip.rankingAutos(mapa,hashCorners,priorityQ,personNode, esquinas)
+    if ranking == []:
+        print("Cars are unable to reach the person. Trip cancelled")
+        return
     m = len(ranking)
     options = [4]
     print("Options | Cars | Cost")
@@ -260,7 +276,7 @@ def createTrip(person, direction):
         print(i+1 , ".      |", ranking[i][0], "  |", ranking[i][1])
         options.append(i+1)
     print("4 . Do not travel")
-    print("Amount of money of the person ", personNode[0], ": ", personNode[2])
+    print("Balance of the person", personNode[0], ": ", personNode[2])
     print("")
     
     eleccion = int(input("Which option do you choose: "))
@@ -308,7 +324,29 @@ def createTrip(person, direction):
     pickle.dump(esquinas, f)
     f.close()
     return
-    
+
+"""
+Función que recibe una ubicación móvil o fija mediante el comando "-getDirection". Imprime la dirección asociada a ese elemento o avisa que
+el elemento no se encuentra, en caso de no estar.
+"""
+def getElementDirection(element):
+    if element[0] == "C" or element[0] == "P":
+        f = open("hashMobile.pickle", "rb")
+        hashMobile = pickle.load(f)
+        f.close()
+        direction = dictionary.search(hashMobile, element)
+        direction = direction[1]
+    else:
+        f = open("hashFixedLocations.pickle", "rb")
+        hashFixed = pickle.load(f)
+        f.close()
+        direction = dictionary.search(hashFixed, element)
+        direction = direction[2]
+    if direction == None:
+        print("Element is not on the map")
+    else:
+        print("The direction is:", direction)
+    return
 """
 Condicionales para manejar los argumentos pasados por consola.
 """
@@ -327,9 +365,8 @@ elif (entrada[0] == "-create_trip"):
 elif (entrada[0] == "-create_map"):
     entrada.pop(0)
     createMap(entrada[0])
-    
-
-
-
-
-
+elif (entrada[0] == "-getDirection"):
+    entrada.pop(0)
+    getElementDirection(entrada[0])
+else:
+    print("Entered command is not valid")
