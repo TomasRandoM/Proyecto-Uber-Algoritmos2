@@ -20,19 +20,19 @@ def insertCar(Graph, carHashTable, priorityCorners, cornerHashTable, auto, esqui
         esquinas[e1].append((e2, auto))
         distancias, antecesores = graph.dijkstra(Graph, e2)
         car = (auto[0], auto[1][3], auto[2])
-        insertPriortyCorners(car, priorityCorners, distancias, None, esquinas)
+        insertPriortyCorners(car, priorityCorners, distancias, None, esquinas, auto, cornerHashTable)
     elif status == 2:
         esquinas[e2].append((e1, auto))
         distancias, antecesores = graph.dijkstra(Graph, e1)
         car = (auto[0], auto[1][1], auto[2])
-        insertPriortyCorners(car, priorityCorners, distancias, None, esquinas)
+        insertPriortyCorners(car, priorityCorners, distancias, None, esquinas, auto, cornerHashTable)
     else:
         esquinas[e1].append((e2, auto))
         esquinas[e2].append((e1, auto))
         distancias, antecesores = graph.dijkstra(Graph, e2)
         distancias2, antecesores2 = graph.dijkstra(Graph, e1)
         car = (auto[0], auto[1][3], auto[1][1], auto[2])
-        insertPriortyCorners(car, priorityCorners, distancias, distancias2, esquinas)
+        insertPriortyCorners(car, priorityCorners, distancias, distancias2, esquinas, auto, cornerHashTable)
     return carHashTable
 
 """
@@ -40,15 +40,33 @@ Función auxiliar que inserta las distancias calculadas por dijkstra del auto a 
 auxiliar "priorityCorners". Utiliza una priorityQueue e inserta en cada espacio el elemento de la forma
 (precio, nombreAuto) siendo precio el precio calculado utilizando distancia y coste del auto y nombreAuto el nombre del vehículo.
 """
-def insertPriortyCorners(auto, priorityCorners, distancias1, distancias2, esquinas):
+def insertPriortyCorners(auto, priorityCorners, distancias1, distancias2, esquinas, car, esquinasHash):
+    if car[1][1] == 0:
+        e1 = dictionary.search(esquinasHash, car[1][0])
+    elif car[1][3] == 0:
+        e1 = dictionary.search(esquinasHash, car[1][2])
+    else:
+        e1 = None
     if distancias2 == None:
         for i in range(0, len(esquinas)):
+            if e1 != None:
+                if e1 == i:
+                    price = auto[2] / 4
+                    priorityCorners[i] = insertWithPriority(priorityCorners[i], (price, auto[0]))
+                    e1 = None
+                    continue
             if priorityCorners[i] == None:
                 priorityCorners[i] = []
             price = (distancias1[i] + auto[1] + auto[2]) / 4
             priorityCorners[i] = insertWithPriority(priorityCorners[i], (price, auto[0]))
     else:
         for i in range(0, len(esquinas)):
+            if e1 != None:
+                if e1 == i:
+                    price = auto[3] / 4
+                    priorityCorners[i] = insertWithPriority(priorityCorners[i], (price, auto[0]))
+                    e1 = None
+                    continue
             if priorityCorners[i] == None:
                 priorityCorners[i] = []
             if distancias1[i] <= distancias2[i]:
@@ -246,15 +264,15 @@ def deleteCars(Graph, priorityCorners, car, oldcar, cornerHashTable, esquinas):
         carAux = (e2, (car))
         esquinas[e1].append(carAux)
         distancias, antecesores = graph.dijkstra(Graph, e2)
-        car = (car[0], car[1][3], car[2])
-        insertPriortyCorners(car, priorityCorners, distancias, None, esquinas)
+        carNew = (car[0], car[1][3], car[2])
+        insertPriortyCorners(carNew, priorityCorners, distancias, None, esquinas, car, cornerHashTable)
     elif status == 2:
         vertice = e2
         carAux = (e1, (car))
         esquinas[e2].append(carAux)
         distancias, antecesores = graph.dijkstra(Graph, e1)
-        car = (car[0], car[1][1], car[2])
-        insertPriortyCorners(car, priorityCorners, distancias, None, esquinas)
+        carNew = (car[0], car[1][1], car[2])
+        insertPriortyCorners(carNew, priorityCorners, distancias, None, esquinas, car, cornerHashTable)
     else:
         carAux = (e2, (car))
         esquinas[e1].append(carAux)
@@ -262,8 +280,8 @@ def deleteCars(Graph, priorityCorners, car, oldcar, cornerHashTable, esquinas):
         esquinas[e2].append(carAux)
         distancias, antecesores = graph.dijkstra(Graph, e2)
         distancias2, antecesores2 = graph.dijkstra(Graph, e1)
-        car = (car[0], car[1][3], car[1][1], car[2])
-        insertPriortyCorners(car, priorityCorners, distancias, distancias2, esquinas)
+        carNew = (car[0], car[1][3], car[1][1], car[2])
+        insertPriortyCorners(carNew, priorityCorners, distancias, distancias2, esquinas, car, cornerHashTable)
         antecesores2.clear()
     antecesores.clear()
     e3 = dictionary.search(cornerHashTable, oldcar[1][0])
