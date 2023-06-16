@@ -61,14 +61,14 @@ def insertPriortyCorners(auto, priorityCorners, distancias1, distancias2, esquin
             priorityCorners[i] = insertWithPriority(priorityCorners[i], (price, auto[0]))
     else:
         for i in range(0, len(esquinas)):
+            if priorityCorners[i] == None:
+                priorityCorners[i] = []
             if e1 != None:
                 if e1 == i:
                     price = auto[3] / 4
                     priorityCorners[i] = insertWithPriority(priorityCorners[i], (price, auto[0]))
                     e1 = None
                     continue
-            if priorityCorners[i] == None:
-                priorityCorners[i] = []
             if distancias1[i] <= distancias2[i]:
                 price = (distancias1[i] + auto[1] + auto[3]) / 4
                 priorityCorners[i] = insertWithPriority(priorityCorners[i], (price, auto[0]))
@@ -159,7 +159,8 @@ def extractCars(priorityCorners, people, vertice, vertice2, corners, enext):
         return newList
     else:
         auxList = []
-        for i in range(0, 3):
+        cont = 0
+        while cont != 3:
             if priorityCorners[vertice] == [] and priorityCorners[vertice2] == []:
                 break
             elif priorityCorners[vertice] == [] and priorityCorners[vertice2] != []:
@@ -169,7 +170,9 @@ def extractCars(priorityCorners, people, vertice, vertice2, corners, enext):
                     break
                 carAux = (car2[1], car2[0] +  (people[2] / 4))
                 auxList.append((vertice2, car2))
-                newList.append(carAux)
+                condition = checkReplace(newList, carAux)
+                if condition == True:
+                    cont += 1
             elif priorityCorners[vertice] != [] and priorityCorners[vertice2] == []:
                 car1 = priorityCorners[vertice].pop(0)
                 dist1 = car1[0] +  (people[1] / 4)
@@ -177,32 +180,68 @@ def extractCars(priorityCorners, people, vertice, vertice2, corners, enext):
                     break
                 carAux = (car1[1], car1[0] +  (people[1] / 4))
                 auxList.append((vertice, car1))
-                newList.append(carAux)
+                condition = checkReplace(newList, carAux)
+                if condition == True:
+                    cont += 1
             else:
                 car1 = priorityCorners[vertice].pop(0)
                 car2 = priorityCorners[vertice2].pop(0)
                 dist1 = car1[0] +  (people[1] / 4)
                 dist2 = car2[0] +  (people[2] / 4)
-                if dist1 <= dist2:
-                    if dist1 > people[0]:
-                        break
-                    carAux = (car1[1], car1[0] +  (people[1] / 4))
+                check1 = checkExists(newList, car1)
+                check2 = checkExists(newList, car2)
+                if (check1 == True) and (check2 == True):
                     auxList.append((vertice, car1))
-                    newList = checkReplace(newList, carAux)
-                    if car1[1] != car2[1]:
-                        priorityCorners[vertice2] = insertWithPriority(priorityCorners[vertice2], car2)
-                    else:
-                        auxList.append((vertice2, car2))
-                else:
+                    auxList.append((vertice2, car2))
+                elif (check1 == True) and (check2 == False):
                     if dist2 > people[0]:
                         break
                     carAux = (car2[1], car2[0] +  (people[2] / 4))
                     auxList.append((vertice2, car2))
-                    newList = checkReplace(newList, carAux)
+                    condition = checkReplace(newList, carAux)
+                    if condition == True:
+                        cont += 1
                     if car1[1] != car2[1]:
                         priorityCorners[vertice] = insertWithPriority(priorityCorners[vertice], car1)
                     else:
                         auxList.append((vertice, car1))
+                elif (check1 == False) and (check2 == True):
+                    if dist1 > people[0]:
+                        break
+                    carAux = (car1[1], car1[0] +  (people[1] / 4))
+                    auxList.append((vertice, car1))
+                    condition = checkReplace(newList, carAux)
+                    if car1[1] != car2[1]:
+                        priorityCorners[vertice2] = insertWithPriority(priorityCorners[vertice2], car2)
+                    else:
+                        auxList.append((vertice2, car2))
+                    if condition == True:
+                        cont += 1
+                else:
+                    if dist1 <= dist2:
+                        if dist1 > people[0]:
+                            break
+                        carAux = (car1[1], car1[0] +  (people[1] / 4))
+                        auxList.append((vertice, car1))
+                        condition = checkReplace(newList, carAux)
+                        if car1[1] != car2[1]:
+                            priorityCorners[vertice2] = insertWithPriority(priorityCorners[vertice2], car2)
+                        else:
+                            auxList.append((vertice2, car2))
+                        if condition == True:
+                            cont += 1
+                    else:
+                        if dist2 > people[0]:
+                            break
+                        carAux = (car2[1], car2[0] +  (people[2] / 4))
+                        auxList.append((vertice2, car2))
+                        condition = checkReplace(newList, carAux)
+                        if car1[1] != car2[1]:
+                            priorityCorners[vertice] = insertWithPriority(priorityCorners[vertice], car1)
+                        else:
+                            auxList.append((vertice, car1))
+                        if condition == True:
+                            cont += 1
         for i in range(0, len(auxList)):
             priorityCorners[auxList[i][0]] = insertWithPriority(priorityCorners[auxList[i][0]], auxList[i][1])
         m = len(corners[vertice])
@@ -213,8 +252,7 @@ def extractCars(priorityCorners, people, vertice, vertice2, corners, enext):
                     dist = aux[1][1]
                 else:
                     dist = aux[1][3]
-                if dist <= people[1]:
-                    price = (abs((people[1] - dist)) + aux[2]) / 4
+                price = (abs((people[1] - dist)) + aux[2]) / 4
                 n = len(newList)
                 if n == 0:
                     if (people[0] >= price):
@@ -224,6 +262,13 @@ def extractCars(priorityCorners, people, vertice, vertice2, corners, enext):
                         insertWithPriorityAux(newList, (aux[0], price))
     return newList
 
+def checkExists(list1, element):
+    if list1 == []:
+        return False
+    for i in range(0, len(list1)):
+        if list1[i][0] == element[1]:
+            return True
+    return False
 """
 Función auxiliar para verificar que un elemento esté en la lista o no. En el caso de estar, verificar que sea posible su
 reemplazo. Se devuelve la lista modificada.
@@ -231,7 +276,7 @@ reemplazo. Se devuelve la lista modificada.
 def checkReplace(list1, element):
     if len(list1) == 0:
         list1.append(element)
-        return list1
+        return True
     else:
         m = len(list1)
         for i in range(0, m):
@@ -239,9 +284,10 @@ def checkReplace(list1, element):
                 if list1[i][1] > element[1]:
                     list1.pop(i)
                     list1.insert(i, element)
-                return list1
+                    return True
+                return False
         list1.append(element)
-    return list1
+    return False
 
 """
 Función que elimina un auto dado de la lista de prioridad de distancias a cada esquina desde cada auto.
