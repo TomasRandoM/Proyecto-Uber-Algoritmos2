@@ -280,6 +280,8 @@ def createTrip(person, direction):
         print("Cars are unable to reach the person or Person does not have enough balance. Trip cancelled")
         return
     m = len(ranking)
+    if m > 3:
+        m = 3
     options = [4]
     print("Options | Cars | Cost")
     for i in range(m):
