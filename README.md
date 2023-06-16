@@ -4,7 +4,7 @@
 
 Repositorio para el proyecto Uber de la materia algoritmos II del año 2023.
 
-Integrantes: Matías Quesada y Tomás Rando
+Integrantes: Tomas Rando (14004) y Manuel Quesada (14003)
 
 Comandos disponibles:
 * -create_map (local path)
