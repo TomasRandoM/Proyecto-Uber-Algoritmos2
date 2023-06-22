@@ -49,14 +49,14 @@ def insertPriortyCorners(auto, priorityCorners, distancias1, distancias2, esquin
         e1 = None
     if distancias2 == None:
         for i in range(0, len(esquinas)):
+            if priorityCorners[i] == None:
+                priorityCorners[i] = []
             if e1 != None:
                 if e1 == i:
                     price = auto[2] / 4
                     priorityCorners[i] = insertWithPriority(priorityCorners[i], (price, auto[0]))
                     e1 = None
                     continue
-            if priorityCorners[i] == None:
-                priorityCorners[i] = []
             price = (distancias1[i] + auto[1] + auto[2]) / 4
             priorityCorners[i] = insertWithPriority(priorityCorners[i], (price, auto[0]))
     else:
